@@ -16,16 +16,30 @@ export default async function bundler(rawCode: string) {
 		}
 	}
 
-	const result = await esbuild.build({
-		entryPoints: ['index.js'],
-		bundle: true,
-		write: false,
-		plugins: [unpkgPathPlugin(), fetchPlugin(rawCode)],
-		define: {
-			'process.env.NODE_ENV': '"production"',
-			global: 'window',
-		},
-	});
+	try {
+		const result = await esbuild.build({
+			entryPoints: ['index.js'],
+			bundle: true,
+			write: false,
+			plugins: [unpkgPathPlugin(), fetchPlugin(rawCode)],
+			define: {
+				'process.env.NODE_ENV': '"production"',
+				global: 'window',
+			},
+		});
 
-	return result.outputFiles[0].text;
+		return {
+			code: result.outputFiles[0].text,
+			err: '',
+		};
+	} catch (err) {
+		if (err instanceof Error) {
+			return {
+				code: '',
+				err: err.message,
+			};
+		} else {
+			throw err;
+		}
+	}
 }
