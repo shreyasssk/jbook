@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import bundler from '../bundler';
 import {
 	DeleteCellAction,
 	InsertCellAfterAction,
@@ -6,6 +7,7 @@ import {
 	UpdateCellAction,
 } from './action-types';
 import { Cell } from './cell';
+import { bundleComplete, bundleStart } from './bundlesReducer';
 
 interface CellsState {
 	loading: boolean;
@@ -16,12 +18,37 @@ interface CellsState {
 	};
 }
 
+interface CreateBundleArgs {
+	cellId: string;
+	input: string;
+}
+
 const initialState: CellsState = {
 	loading: false,
 	error: null,
 	order: [],
 	data: {},
 };
+
+export const createBundle = createAsyncThunk(
+	'cells/createBundle',
+	async ({ cellId, input }: CreateBundleArgs, { dispatch }) => {
+		dispatch(
+			bundleStart({
+				cellId,
+			})
+		);
+
+		const result = await bundler(input);
+
+		dispatch(
+			bundleComplete({
+				cellId,
+				bundle: result,
+			})
+		);
+	}
+);
 
 const cellsSlice = createSlice({
 	name: 'cells',

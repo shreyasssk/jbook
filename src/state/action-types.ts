@@ -6,6 +6,8 @@ export enum ActionType {
 	INSERT_CELL_BEFORE = 'insert_cell_before',
 	INSERT_CELL_AFTER = 'insert_cell_after',
 	UPDATE_CELL = 'update_cell',
+	BUNDLE_START = '',
+	BUNDLE_COMPLETE = '',
 }
 
 export type Direction = 'up' | 'down';
@@ -33,9 +35,23 @@ export interface UpdateCellAction {
 	content: string;
 }
 
+export interface BundleStartAction {
+	cellId: string;
+}
+
+export interface BundleCompleteAction {
+	cellId: string;
+	bundle: {
+		code: string;
+		err: string;
+	};
+}
+
 export type Action =
 	| MoveCellAction
 	| DeleteCellAction
 	| InsertCellBeforeAction
 	| InsertCellAfterAction
-	| UpdateCellAction;
+	| UpdateCellAction
+	| BundleStartAction
+	| BundleCompleteAction;
